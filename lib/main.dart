@@ -5,6 +5,8 @@ import 'package:instagram_stories_app/data.dart';
 import 'package:instagram_stories_app/models/story_model.dart';
 import 'package:video_player/video_player.dart';
 
+import 'models/user_model.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -56,7 +58,6 @@ class _StoryScreenState extends State<StoryScreen>
 
   @override
   void initState() {
-    // TODO: implement initState
     _pageController = PageController();
     _animationController = AnimationController(vsync: this);
     _videoController =
@@ -133,21 +134,32 @@ class _StoryScreenState extends State<StoryScreen>
               top: 40,
               left: 10,
               right: 10,
-              child: Row(
-                children: widget.stories
-                    .asMap()
-                    .map((key, value) {
-                      return MapEntry(
-                        key,
-                        AnimatedBar(
-                          animationController: _animationController,
-                          position: key,
-                          currentIndex: _currentIndex,
-                        ),
-                      );
-                    })
-                    .values
-                    .toList(),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    children: widget.stories
+                        .asMap()
+                        .map((key, value) {
+                          return MapEntry(
+                            key,
+                            AnimatedBar(
+                              animationController: _animationController,
+                              position: key,
+                              currentIndex: _currentIndex,
+                            ),
+                          );
+                        })
+                        .values
+                        .toList(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 1.5,
+                      vertical: 10.0,
+                    ),
+                    child: UserInfo(user: story.user),
+                  ),
+                ],
               ),
             ),
           ],
@@ -282,6 +294,47 @@ class AnimatedBar extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(3.0),
       ),
+    );
+  }
+}
+
+class UserInfo extends StatelessWidget {
+  const UserInfo({
+    required this.user,
+    Key? key,
+  }) : super(key: key);
+
+  final User user;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        CircleAvatar(
+          radius: 20.0,
+          backgroundColor: Colors.grey[300],
+          backgroundImage: CachedNetworkImageProvider(user.profileImageUrl),
+        ),
+        const SizedBox(width: 10.0),
+        Expanded(
+          child: Text(
+            user.name,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        IconButton(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(
+            Icons.close,
+            size: 30.0,
+            color: Colors.white,
+          ),
+        ),
+      ],
     );
   }
 }
